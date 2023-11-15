@@ -68,3 +68,6 @@ Accessed via ‘agena.ai.modeller’ software (version 9336, www.agena.ai) model
   
 ### CONTACT
 [NormANFramework@gmail.com](mailto:NormANFramework@gmail.com)
+
+### LICENSE
+© 2023. This work is openly licensed via CC BY-NC 4.0 by Leon Schöppl, Ulrike Hahn, Leon Assaad, Kirsty Phillips, Rafael Fuchs and Ammar Jalalimanesh.
