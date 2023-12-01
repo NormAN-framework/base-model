@@ -1346,7 +1346,7 @@ SWITCH
 124
 reset-social-network-?
 reset-social-network-?
-1
+0
 1
 -1000
 
