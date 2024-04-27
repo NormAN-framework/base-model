@@ -38,7 +38,10 @@ The ‘plotting-type’ chooser gives three options for visualizing the frequenc
 Thiele, JC; Grimm, V (2010). NetLogo meets R: Linking agent-based models with a toolbox for their analysis. Environmental Modelling and Software, Volume 25, Issue 8: 972 - 974 [DOI: 10.1016/j.envsoft.2010.02.008].
 
 * **bnlearn package**
--Scutari M (2010). “Learning Bayesian Networks with the bnlearn R Package.” Journal of Statistical Software, 35(3), 1–22. doi:10.18637/jss.v035.i03.
+Scutari M (2010). “Learning Bayesian Networks with the bnlearn R Package.” Journal of Statistical Software, 35(3), 1–22. doi:10.18637/jss.v035.i03.
+
+* **gRain package**
+Højsgaard S (2012). “Graphical Independence Networks with the gRain Package for R.” Journal of Statistical Software, 46(10), 1–26. doi:10.18637/jss.v046.i10, https://www.jstatsoft.org/v46/i10/.
 
 ##### SOCIAL NETWORKS
 
