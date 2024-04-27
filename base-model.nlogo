@@ -155,6 +155,49 @@ to compute-posterior
   if show-me-? [print (word "The rQuery for compute-optimal-posterior is " rQuery)]
 
   ;***********************************************************************************************************************************
+  ;gRain
+  let gRainQuery "ev <- setEvidence(gRainbn, nodes = c("
+
+  set x 0 ;iterates through all eNodes
+  set y 0 ;keeps track of the additions to the rQuery string
+  while [x < number-of-evidence] [
+
+    if member? x heard-sorted [
+      set gRainQuery (word gRainQuery "'"item x evidence-nodes"'")
+      set y y + 1
+      if y < length heard-sorted [set gRainQuery (word gRainQuery " , ")]
+    ]
+    set x x + 1
+  ]
+
+  set gRainQuery (word gRainQuery "), , states = c(")
+
+  set x 0 ;iterates through all eNodes
+  set y 0 ;keeps track of the additions to the rQuery string
+
+
+  while [x < number-of-evidence] [
+
+    if member? x heard-sorted [
+      set gRainQuery (word gRainQuery "'"item x agent-evidence-list"'")
+      set y y + 1
+      if y < length heard-sorted [set gRainQuery (word gRainQuery " , ")]
+    ]
+    set x x + 1
+  ]
+   set gRainQuery (word gRainQuery "))")
+
+
+  ;if show-me-? [show  gRainQuery]
+  r:eval gRainQuery
+
+  let gRainQuery2 (word "matrix.cpt <- querygrain(ev, nodes = c('"hypothesis-node"'), type = 'joint')")
+  ;if show-me-? [show gRainQuery2]
+  r:eval gRainQuery2
+
+
+
+  ;***********************************************************************************************************************************
 
 
   ;Here again, we repeat the query to counteract approximation errors.
@@ -170,6 +213,11 @@ to compute-posterior
   if approximation = "seed"[
     r:eval (word "set.seed("seed") ")
     set b1 r:get rQuery
+  ]
+
+   if approximation = "gRain" [
+   set b1 r:get (word "probability_H_true <- as.numeric(matrix.cpt['yes'])")
+
   ]
 
   if show-me-? [show (word "my posterior: " b1)]
@@ -196,7 +244,22 @@ to compute-singular ;It computes how much the last received piece of evidence wo
     ;the following block creates a string that is later used to query the R instance
     let rQuery (word "cpquery("Bayes-net", event = ("Hypothesis-node" == 'yes'), evidence = (")
     set rQuery (word rQuery ""item last-heard evidence-nodes" == '" item last-heard evidence-list "' ))")
+
     ;***********************************************************************************************************************************
+
+    ;gRain
+
+    let gRainQuery (word "ev <- setEvidence(gRainbn, nodes = c('"item last-heard evidence-nodes"'),")
+    set gRainQuery (word gRainQuery " states = c('" item last-heard evidence-list "'))")
+    ;if show-me-?[show gRainQuery]
+    r:eval gRainQuery
+
+    let gRainQuery2 (word "matrix.cpt <- querygrain(ev, nodes = c('"hypothesis-node"'), type = 'joint')")
+    ;if show-me-? [show gRainQuery2]
+    r:eval gRainQuery2
+
+
+    ;****************************************************************************************
 
     let r 0
     if approximation = "repeater"[
@@ -209,6 +272,9 @@ to compute-singular ;It computes how much the last received piece of evidence wo
     if approximation = "seed"[
       r:eval (word "set.seed("seed") ")
       set r r:get rQuery
+    ]
+    if approximation = "gRain"[
+      set r r:get (word "probability_H_true <- as.numeric(matrix.cpt['yes'])")
     ]
 
   if show-me-? [
@@ -279,6 +345,8 @@ to compute-optimal-posterior
 
   let rQuery (word "cpquery("Bayes-net", event = ("Hypothesis-node" == 'yes'), evidence = (")
 
+
+
   let x 0
   while [x < number-of-evidence] [
     set rQuery (word rQuery "" item x evidence-nodes " == '" item x evidence-list "' ")
@@ -288,6 +356,42 @@ to compute-optimal-posterior
   set rQuery (word rQuery "))")
 
   if show-me-? [print (word "The rQuery for compute-optimal-posterior is " rQuery)]
+
+  ;******************************************************************
+ let gRainQuery "ev <- setEvidence(gRainbn, nodes = c("
+
+ set x 0
+  while [x < number-of-evidence] [
+      set gRainQuery (word gRainQuery "'"item x evidence-nodes"'")
+      set x x + 1
+      if x < number-of-evidence [set gRainQuery (word gRainQuery " , ")]
+  ]
+
+  set gRainQuery (word gRainQuery "), , states = c(")
+
+  set x 0 ;iterates through all eNodes
+  while [x < number-of-evidence] [
+
+
+      set gRainQuery (word gRainQuery "'"item x evidence-list"'")
+       set x x + 1
+      if x < number-of-evidence [set gRainQuery (word gRainQuery " , ")]
+  ]
+
+  set gRainQuery (word gRainQuery "))")
+  ;if show-me-? [ show gRainQuery]
+  r:eval gRainQuery
+
+
+  let gRainQuery2 (word "matrix.cpt <- querygrain(ev, nodes = c('"hypothesis-node"'), type = 'joint')")
+  ;if show-me-? [ show gRainQuery2]
+  r:eval gRainQuery2
+
+
+  ;if show-me-? [ show (word "The gRain queries for the optimal posterior are " gRainQuery " and " gRainQuery2 ".")]
+
+
+  ;******************************************************************
 
   if approximation = "repeater"[
     repeat repeater [
@@ -300,6 +404,12 @@ to compute-optimal-posterior
     r:eval (word "set.seed("seed") ")
     set optimal-posterior r:get rQuery
   ]
+  if approximation = "gRain"[
+
+    set optimal-posterior r:get (word "probability_H_true <- as.numeric(matrix.cpt['yes'])")
+  ]
+
+
   if show-me-? [show (word "The optimal posterior is " optimal-posterior)]
 end
 
@@ -483,6 +593,13 @@ to initializeAgents
     ;This is the agent's initial belief in the hypothesis, determined by the CPT.
     let rQuery (word "cpquery("Bayes-net", event = ("Hypothesis-node" == 'yes'), evidence = TRUE)")
 
+    ;gRain
+    let gRainQuery "evg <- setEvidence(gRainbn, nodes = TRUE, states = TRUE)"
+    let gRainQuery2 (word "matrix.cpt <- querygrain(evg, nodes = c('"hypothesis-node"'), type = 'joint')")
+    ;if show-me-? [show (word "gRainQueries are " gRainQuery " and " gRainQuery2 ".")]
+    r:eval gRainQuery
+    r:eval gRainQuery2
+
     let r 0
     if approximation = "repeater"[
       repeat repeater [let v r:get rQuery
@@ -492,6 +609,9 @@ to initializeAgents
       r:eval (word "set.seed("seed") ")
       let v r:get rQuery
       set r v ]
+    if approximation = "gRain" [
+      set r r:get (word "probability_H_true <- as.numeric(matrix.cpt['yes'])")
+    ]
 
     set agent-belief r
     set initial-belief r
@@ -533,6 +653,39 @@ to initializeAgents
 end
 
 to reset-evidence
+  ;******************************************************************************************************
+    ;This is the agent's initial belief in the hypothesis, determined by the CPT.
+    let rQuery (word "cpquery("Bayes-net", event = ("Hypothesis-node" == 'yes'), evidence = TRUE)")
+
+
+    ;gRain
+    let gRainQuery "evg <- setEvidence(gRainbn, nodes = TRUE, states = TRUE)"
+    let gRainQuery2 (word "matrix.cpt <- querygrain(evg, nodes = c('"hypothesis-node"'), type = 'joint')")
+    ;if show-me-? [show (word "gRainQueries are " gRainQuery " and " gRainQuery2 ".")]
+      r:eval gRainQuery
+      r:eval gRainQuery2
+
+
+    ;******************************************************************************************************
+    let r 0
+    if approximation = "repeater"[
+      repeat repeater [let v r:get rQuery
+        set r (r + v)]
+      set r (r / repeater)]
+    if approximation = "seed"[
+      r:eval (word "set.seed("seed") ")
+      let v r:get rQuery
+      set r v ]
+
+    if approximation = "gRain" [
+   set r r:get (word "probability_H_true <- as.numeric(matrix.cpt['yes'])")
+
+  ]
+
+
+
+
+
   let c random-float 1
   ifelse c < hypothesis-probability [set hypothesis-value "yes"][set hypothesis-value "no"]
 
@@ -547,7 +700,7 @@ to reset-evidence
   ;Then, we use that probability to determine the actual value of each piece  of evidence
   let x 0
   while [x < number-of-evidence] [
-    let r 0
+    set r 0
 
     if approximation = "repeater" [
       repeat repeater[
@@ -559,6 +712,15 @@ to reset-evidence
     if approximation = "seed" [
       r:eval (word "set.seed("seed") ")
       set r (r:get (word "cpquery(" Bayes-net ", event = ("item x evidence-nodes" == 'yes'), evidence = (" Hypothesis-node " == '" hypothesis-value "'))"))
+    ]
+
+   if approximation = "gRain"
+    [
+
+  r:eval  (word "ev <- setEvidence(gRainbn, nodes = c('"Hypothesis-node"'), states = c('"hypothesis-value"'))"  )
+  r:eval (word "matrix.cpt <- querygrain(ev, nodes = c('"item x evidence-nodes"'), type = 'joint')")
+ set r r:get (word "probability_H_true <- as.numeric(matrix.cpt['yes'])")
+
     ]
 
     let n random-float 1
@@ -575,7 +737,7 @@ to reset-evidence
 
   if show-me-?[
     show  (word "Probabilities that evidence nodes are true, given truth/falsity of hypothesis: " evidence-probabilities-list)
-    show (word "Evidence list " evidence-list)
+    show (word "Evidence list: " evidence-list)
   ]
 
   set arguments [] ;resets arguments counter
@@ -591,6 +753,8 @@ to reset-evidence
     set initial-draws maximum-draws
     print "Note: automatically adjusted [initial-draws]."
   ]
+
+
 
  end
 
@@ -665,6 +829,7 @@ end
 ;******************************************************************
 
 to loadDAG
+  if approximation = "gRain" [r:eval "library(gRain)"]
   r:eval "library (bnlearn)" ;the R library that lets us use Bayes' nets
 
   if causal-structure = "big net"[LoadBigNet]
@@ -687,6 +852,7 @@ to loadDAG
 
 
     ;#####################COPY-PASTE END
+    if approximation = "gRain" [r:eval "gRainbn <- compile(as.grain(bn))"]
     useCustomEvidenceAndHypothesisNodes
   ]
 
@@ -713,6 +879,7 @@ to loadAsiaNet
    r:eval  "data(asia)"
    r:eval  "dag <- model2network('[A][S][T|A][L|S][B|S][D|B:E][E|T:L][X|E]')"
    r:eval  "bn <- bn.fit(dag, asia)"
+    if approximation = "gRain" [r:eval "gRainbn <- compile(as.grain(bn))"]
 
   ifelse custom-evidence-and-hypothesis-? = false [
     set hypothesis-node "L"
@@ -748,6 +915,7 @@ r:eval "cptA3 <- array(c(0.9,0.1,0.001,0.999,1,0,0.3,0.7), dim = c(2,2,2),  dimn
 r:eval "cptE7 <- array(c(1,0,1,0,0.2,0.8,1,0,1,0,0.4,0.6,0.01,0.99,0,1),dim = c(2,2,2,2), dimnames = list(E7 = c('no','yes'), A3= c('no', 'yes'), H5= c('no', 'yes'),H1= c('no', 'yes')))"
 r:eval "cpt1 <- list( H0 = cptH0, M1 = cptM1, M2 = cptM2, M3 = cptM3, Vole_present = cptVole_present, E1 = cptE1, A1 = cptA1, E2 = cptE2, A2 = cptA2, H1 = cptH1, H5 = cptH5, E6 = cptE6, E7 = cptE7, A3 = cptA3, H2 = cptH2, H3 = cptH3, H4 = cptH4, E3 = cptE3, E4 = cptE4, E5 = cptE5, Auxilliary = cptAuxilliary, Constraint = cptConstraint)"
 r:eval "bn <- custom.fit(dag1, cpt1)"
+ if approximation = "gRain" [r:eval "gRainbn <- compile(as.grain(bn))"]
 
   ifelse custom-evidence-and-hypothesis-? = false [
     set hypothesis-node "H0"
@@ -762,6 +930,7 @@ to loadAlarmNet
   r:eval "data(alarm)"
   r:eval "dag <- model2network('[HIST|LVF][CVP|LVV][PCWP|LVV][HYP][LVV|HYP:LVF][LVF][STKV|HYP:LVF][ERLO][HRBP|ERLO:HR][HREK|ERCA:HR][ERCA][HRSA|ERCA:HR][ANES][APL][TPR|APL][ECO2|ACO2:VLNG][KINK][MINV|INT:VLNG][FIO2][PVS|FIO2:VALV][SAO2|PVS:SHNT][PAP|PMB][PMB][SHNT|INT:PMB][INT][PRSS|INT:KINK:VTUB][DISC][MVS][VMCH|MVS][VTUB|DISC:VMCH][VLNG|INT:KINK:VTUB][VALV|INT:VLNG][ACO2|VALV][CCHL|ACO2:ANES:SAO2:TPR][HR|CCHL][CO|HR:STKV][BP|CO:TPR]')"
   r:eval  "bn <- bn.fit(dag, alarm)"
+  ;r:eval "gRainbn <- compile(as.grain(bn))"
 
   ifelse custom-evidence-and-hypothesis-? = false [
     set hypothesis-node "CVP"
@@ -774,16 +943,17 @@ end
 
 to loadWetGrassNet
 
-r:eval "library (bnlearn)"
+  r:eval "library (bnlearn)"
 
-r:eval "dag1 <- model2network('[Rain][Sprinkler][Watson|Rain][Holmes|Rain:Sprinkler]')"
+  r:eval "dag1 <- model2network('[Rain][Sprinkler][Watson|Rain][Holmes|Rain:Sprinkler]')"
 
-r:eval "cptRain <- array(c(0.2,0.8), dim = 2, dimnames = list(Rain = c('yes', 'no')))"
-r:eval "cptSprinkler <- array(c(0.1,0.9), dim = 2, dimnames = list(Sprinkler = c('yes', 'no')))"
-r:eval "cptWatson <- array(c(1.0,0.0,0.2,0.8), dim = c(2,2), dimnames = list(Watson = c('yes', 'no'),Rain = c('yes', 'no')))"
-r:eval "cptHolmes <- array(c(1.0, 0.0, 0.9, 0.1,1.0,0.0,0.0,1.0), dim = c(2,2,2), dimnames = list(Holmes = c('yes', 'no'), Rain = c('yes', 'no'), Sprinkler = c('yes', 'no')) )"
-r:eval "cpt1 <- list(Rain = cptRain,Sprinkler = cptSprinkler, Watson = cptWatson,  Holmes =cptHolmes)"
-r:eval "bn <- custom.fit(dag1, cpt1)"
+  r:eval "cptRain <- array(c(0.2,0.8), dim = 2, dimnames = list(Rain = c('yes', 'no')))"
+  r:eval "cptSprinkler <- array(c(0.1,0.9), dim = 2, dimnames = list(Sprinkler = c('yes', 'no')))"
+  r:eval "cptWatson <- array(c(1.0,0.0,0.2,0.8), dim = c(2,2), dimnames = list(Watson = c('yes', 'no'),Rain = c('yes', 'no')))"
+  r:eval "cptHolmes <- array(c(1.0, 0.0, 0.9, 0.1,1.0,0.0,0.0,1.0), dim = c(2,2,2), dimnames = list(Holmes = c('yes', 'no'), Rain = c('yes', 'no'), Sprinkler = c('yes', 'no')) )"
+  r:eval "cpt1 <- list(Rain = cptRain,Sprinkler = cptSprinkler, Watson = cptWatson,  Holmes =cptHolmes)"
+  r:eval "bn <- custom.fit(dag1, cpt1)"
+  if approximation = "gRain" [r:eval "gRainbn <- compile(as.grain(bn))"]
 
   ifelse custom-evidence-and-hypothesis-? = false [
     set hypothesis-node "Sprinkler"
@@ -808,7 +978,7 @@ r:eval "cptGuilty <- array(c(0.0,1.0,0.0,1.0,1.0,0.0), dim = c(2, 3), dimnames =
 r:eval "cptFindings <- array(c(0.0,0.0,1.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0,0.0,0.0), dim = c(3,2,2), dimnames = list(Findings = c('Both Murdered', 'Either Murdered', 'Neither Murdered'), ChildBCause = c('no', 'yes'), ChildACause = c('no', 'yes')))"
 r:eval "cpt1 <- list(ChildABruising = cptChildABruising, ChildADisease = cptChildADisease, ChildBBruising = cptChildBBruising, ChildBDisease = cptChildBDisease, ChildACause = cptChildACause, ChildBCause = cptChildBCause, Findings = cptFindings, Guilty = cptGuilty)"
 r:eval "bn <- custom.fit(dag1, cpt1)"
-
+   if approximation = "gRain" [r:eval "gRainbn <- compile(as.grain(bn))"]
   ifelse custom-evidence-and-hypothesis-? = false [
     set hypothesis-node "Guilty"
     set evidence-nodes ["ChildADisease" "ChildBDisease" "ChildABruising" "ChildBBruising"]
@@ -835,6 +1005,7 @@ to loadBigNet
   r:eval  "cptnine <- array(c(0.7, 0.3, 0.3, 0.7), dim = c(2, 2), dimnames = list(nine = c('yes', 'no'), D = c('yes', 'no')))"
   r:eval  "cpt1 <- list(A = cptA, B = cptB, C = cptC, D = cptD, one = cptone, two = cpttwo, three = cptthree, four = cptfour, five = cptfive, six = cptsix, seven = cptseven, eight = cpteight, nine = cptnine)"
   r:eval  "bn <- custom.fit(dag1, cpt1)"
+  if approximation = "gRain" [r:eval "gRainbn <- compile(as.grain(bn))"]
 
   ifelse custom-evidence-and-hypothesis-? = false [
     set hypothesis-node "A"
@@ -855,6 +1026,7 @@ to loadSmallNet
   r:eval  "cptRS <- array(c(0.2, 0.8, 0.8, 0.2), dim = c(2, 2), dimnames = list(RS = c('yes', 'no'), VT = c('yes', 'no')))"
   r:eval  "cpt <- list(V = cptV, VT = cptVT, CS = cptCS, I = cptI, M = cptM, WHO = cptWHO, RS = cptRS)"
   r:eval  "bn <- custom.fit(dag, cpt)"
+  if approximation = "gRain" [r:eval "gRainbn <- compile(as.grain(bn))"]
 
   ifelse custom-evidence-and-hypothesis-? = false [
     set evidence-nodes ["I" "M" "WHO" "RS"]
@@ -1165,7 +1337,7 @@ CHOOSER
 286
 approximation
 approximation
-"seed" "repeater"
+"gRain" "seed" "repeater"
 0
 
 PLOT
