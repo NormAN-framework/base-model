@@ -85,7 +85,7 @@ end
 
 to go
 
-  if check-stoping-conditions [stop] ;Optionally, the simulation stops when all agents know all the evidence or when max-ticks is reached.
+  if check-stopping-conditions [stop] ;Optionally, the simulation stops when all agents know all the evidence or when max-ticks is reached.
 
   if show-me-? [
     show (word "--------------------------------------------")
@@ -803,7 +803,7 @@ to plotArguments
     ]
 end
 
-to-report  check-stoping-conditions
+to-report  check-stopping-conditions
   let stop? false
 
   if stop-at-full-information-? [
