@@ -9,10 +9,14 @@ NormAN is a NetLogo model of argument exchange between Bayesian agents about a p
 * Agents receive evidence about that world (through inquiry) and may communicate that evidence to others as arguments and receive it in turn. Agents aggregate all evidence/arguments that they have encountered to form a degree of belief in the target claim. To this end, they use Bayes’ rule.
 * Communication, finally, takes place across a social network.
 
-### PAPERS USING THE FRAMEWORK
+### PAPERS USING THIS FRAMEWORK
 * Hahn, Assaad & Burton (2024) [*“Opinion Averaging versus Argument Exchange“*](https://escholarship.org/uc/item/9d14q4tv).
 * Schöppl & Hahn (2024) [*“Exploring Effects of Self-Censoring through Agent-Based Simulation“*](https://escholarship.org/uc/item/9b32v6xc).
 * Assaad & Hahn (2024) [*“Rational Polarization: Sharing Only One’s Best Evidence Can Lead to Group Polarization“*](https://escholarship.org/uc/item/6x80n8v4).
+* Assaad, Fuchs, Phillips, Schöppl & Hahn (2025) [*“Capturing Argument in Agent-based Models“*](https://link.springer.com/article/10.1007/s11245-025-10215-2).
+* Schöppl (2025) [*“Industry Influencing Collective Scientific Reasoning: An Agent-based Exploration“*](https://escholarship.org/uc/item/06t6b7v0).
+* Hahn, Assaad & Schöppl (2025) [*“Flooding the Zone: An Agent-based Exploration“*](https://escholarship.org/uc/item/8z32x661).
+* Assaad (2025) [*“Multi-Option Polarization: How Deliberating More Options Both Increases and Decreases Polarization“*](https://escholarship.org/uc/item/5dt8g8c1).
 
 ### HOW TO GET STARTED
 
