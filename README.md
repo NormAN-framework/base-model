@@ -2,7 +2,7 @@
 
 This base model is the first implementation of the *NormAN* framework. NormAN – short for Normative Argument Exchange across Networks – is a framework for agent-based modelling of argument exchange in social networks, first presented in Assaad et.al, (2023). A detailed explanation of the base model and its parameters can be found there.
 
-**Full reference:** Assaad, L., Fuchs, R., Jalalimanesh, A., Phillips, K., Schöppl, K. & Hahn, U. (2023). *“A Bayesian Agent-Based Framework for Argument Exchange Across Networks“*.
+**Full reference:** Assaad, L., Fuchs, R., Jalalimanesh, A., Phillips, K., Schöppl, K. & Hahn, U. (2023). [*“A Bayesian Agent-Based Framework for Argument Exchange Across Networks“*](https://arxiv.org/abs/2311.09254).
 
 NormAN is a NetLogo model of argument exchange between Bayesian agents about a particular hypothesis. It comprises three components: a ‘world’ model, individual agents, and a social network. NormAN's base model offers the user the possibility to change each of these components and thus explore a variety of different argumentation scenarios.
 * The world model consists of a Bayesian network which determines the true state of the hypothesis, along with the truth values of so-called evidence propositions connected to said hypothesis.
